@@ -1,0 +1,7 @@
+# 配置服务监听地址
+port: 5000
+# 配置第三方发件服务
+username: postuser@mail.com
+password: xxxx
+smtpserver: smtp.mail.com
+smtpserverport: 25

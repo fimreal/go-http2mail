@@ -36,7 +36,7 @@ func init() {
 	// viper.SetDefault("smtpserverport", 25)
 
 	// 配置文件名字，不包含后缀。 此外可以手动指定配置文件格式： viper.SetConfigType("yaml")
-	viper.SetConfigName("go-mail")
+	viper.SetConfigName("go-http2mail")
 	// 添加配置搜索的第一个路径，设置为与二进制文件同目录
 	viper.AddConfigPath(".")
 	// 判断加载配置文件是否正确

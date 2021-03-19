@@ -5,7 +5,7 @@
 例如：
 
 ```bash
-curl localhost:5000/mailme -X POST -d 'mailto=abc@abc.com' -d 'subject=邮件标题 -d “body=邮件内容”
+curl localhost:5000/mailme -X POST -d 'mailto=abc@abc.com' -d 'subject=邮件标题' -d "body=邮件内容"
 ```
 
 

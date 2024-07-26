@@ -1,11 +1,11 @@
-FROM golang:latest as builder
+FROM golang:latest AS builder
 COPY . /app
 RUN cd /app &&\
     make docker-build &&\
     ls -l bin 
 
 # 下载证书
-FROM alpine:latest as ca
+FROM alpine:latest AS ca
 RUN apk --no-cache add ca-certificates
 
 # 

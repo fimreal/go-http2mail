@@ -1,4 +1,4 @@
-NAME=go-http2mail
+NAME=http2mail
 APPDIR=./
 BINDIR=bin
 VERSION=$(shell git describe --tags || echo "unknown_version")

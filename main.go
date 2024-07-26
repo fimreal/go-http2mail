@@ -17,7 +17,7 @@ import (
 // EmailRequest 定义请求体结构
 type EmailRequest struct {
 	APIKey     string `json:"api_key"`               // API 密钥
-	Email      string `json:"email"`                 // 发件人邮箱
+	Username   string `json:"email"`                 // 发件人邮箱
 	Password   string `json:"password"`              // 发件人邮箱密码
 	SenderName string `json:"sender_name"`           // 发件人名称
 	Recipient  string `json:"recipient"`             // 收件人邮箱
@@ -84,7 +84,7 @@ func sendEmail(req EmailRequest) error {
 		smtpServer = req.SMTPServer
 		smtpPort = req.SMTPPort
 	} else {
-		smtpServer, smtpPort, err = getSMTPConfig(req.Email)
+		smtpServer, smtpPort, err = getSMTPConfig(req.Username)
 		if err != nil {
 			return err
 		}
@@ -112,7 +112,7 @@ func sendEmail(req EmailRequest) error {
 			return fmt.Errorf("failed to create SMTP client: %w", err)
 		}
 
-		auth = smtp.PlainAuth("", req.Email, req.Password, smtpServer)
+		auth = smtp.PlainAuth("", req.Username, req.Password, smtpServer)
 
 		if err = c.Auth(auth); err != nil {
 			return fmt.Errorf("authentication failed: %w", err)
@@ -121,9 +121,9 @@ func sendEmail(req EmailRequest) error {
 
 		to := []string{req.Recipient}
 		msg := []byte(fmt.Sprintf("From: %s <%s>\nTo: %s\nSubject: %s\n\n%s",
-			req.SenderName, req.Email, req.Recipient, req.Subject, req.Message))
+			req.SenderName, req.Username, req.Recipient, req.Subject, req.Message))
 
-		if err = c.Mail(req.Email); err != nil {
+		if err = c.Mail(req.Username); err != nil {
 			return fmt.Errorf("failed to set sender: %w", err)
 		}
 
@@ -159,7 +159,7 @@ func sendEmail(req EmailRequest) error {
 			}
 		}
 
-		auth = smtp.PlainAuth("", req.Email, req.Password, smtpServer)
+		auth = smtp.PlainAuth("", req.Username, req.Password, smtpServer)
 
 		if err = conn.Auth(auth); err != nil {
 			return fmt.Errorf("authentication failed: %w", err)
@@ -167,9 +167,9 @@ func sendEmail(req EmailRequest) error {
 
 		to := []string{req.Recipient}
 		msg := []byte(fmt.Sprintf("From: %s <%s>\nTo: %s\nSubject: %s\n\n%s",
-			req.SenderName, req.Email, req.Recipient, req.Subject, req.Message))
+			req.SenderName, req.Username, req.Recipient, req.Subject, req.Message))
 
-		if err = conn.Mail(req.Email); err != nil {
+		if err = conn.Mail(req.Username); err != nil {
 			return fmt.Errorf("failed to set sender: %w", err)
 		}
 

@@ -1,14 +1,18 @@
 NAME=go-http2mail
-APPDIR=./app
+APPDIR=./
 BINDIR=bin
-VERSION=$(shell git describe --tags || echo "unknown version")
+VERSION=$(shell git describe --tags || echo "unknown_version")
 BUILDTIME=$(shell date -u)
-GOBUILD=CGO_ENABLED=0 go build 
+GOBUILDARGS=-ldflags '-s -w'
+GOBUILD=CGO_ENABLED=0 go build $(GOBUILDARGS)
 
 PLATFORM_LIST = \
 	darwin-amd64 \
+	darwin-amd64-v3 \
+	darwin-arm64 \
 	linux-386 \
 	linux-amd64 \
+	linux-amd64-v3 \
 	linux-armv5 \
 	linux-armv6 \
 	linux-armv7 \
@@ -20,26 +24,43 @@ PLATFORM_LIST = \
 	linux-mips64 \
 	linux-mips64le \
 	freebsd-386 \
-	freebsd-amd64
+	freebsd-amd64 \
+	freebsd-arm64
 
 WINDOWS_ARCH_LIST = \
 	windows-386 \
 	windows-amd64 \
-	windows-arm32v7
+	windows-amd64-v3 \
+	windows-armv7 \
+	windows-arm64
 
-all: linux-amd64 darwin-amd64 windows-amd64 # Most used
+default: docker-build
+
+all: linux-amd64 linux-armv7 darwin-amd64 darwin-arm64 windows-amd64 # Most used
 
 docker:
-	$(GOBUILD) -o $(BINDIR)/$(NAME)-$@ $(APPDIR)
+	docker build -t $(NAME) .
+
+docker-build:
+	$(GOBUILD) -o $(BINDIR)/$(NAME) $(APPDIR)
 
 darwin-amd64:
 	GOARCH=amd64 GOOS=darwin $(GOBUILD) -o $(BINDIR)/$(NAME)-$@ $(APPDIR)
+
+darwin-amd64-v3:
+	GOARCH=amd64 GOOS=darwin GOAMD64=v3 $(GOBUILD) -o $(BINDIR)/$(NAME)-$@ $(APPDIR)
+
+darwin-arm64:
+	GOARCH=arm64 GOOS=darwin $(GOBUILD) -o $(BINDIR)/$(NAME)-$@ $(APPDIR)
 
 linux-386:
 	GOARCH=386 GOOS=linux $(GOBUILD) -o $(BINDIR)/$(NAME)-$@ $(APPDIR)
 
 linux-amd64:
 	GOARCH=amd64 GOOS=linux $(GOBUILD) -o $(BINDIR)/$(NAME)-$@ $(APPDIR)
+
+linux-amd64-v3:
+	GOARCH=amd64 GOOS=linux GOAMD64=v3 $(GOBUILD) -o $(BINDIR)/$(NAME)-$@ $(APPDIR)
 
 linux-armv5:
 	GOARCH=arm GOOS=linux GOARM=5 $(GOBUILD) -o $(BINDIR)/$(NAME)-$@ $(APPDIR)
@@ -77,14 +98,23 @@ freebsd-386:
 freebsd-amd64:
 	GOARCH=amd64 GOOS=freebsd $(GOBUILD) -o $(BINDIR)/$(NAME)-$@ $(APPDIR)
 
+freebsd-arm64:
+	GOARCH=arm64 GOOS=freebsd $(GOBUILD) -o $(BINDIR)/$(NAME)-$@ $(APPDIR)
+
 windows-386:
 	GOARCH=386 GOOS=windows $(GOBUILD) -o $(BINDIR)/$(NAME)-$@.exe $(APPDIR)
 
 windows-amd64:
 	GOARCH=amd64 GOOS=windows $(GOBUILD) -o $(BINDIR)/$(NAME)-$@.exe $(APPDIR)
-	
-windows-arm32v7:
+
+windows-amd64-v3:
+	GOARCH=amd64 GOOS=windows GOAMD64=v3 $(GOBUILD) -o $(BINDIR)/$(NAME)-$@.exe $(APPDIR)
+
+windows-armv7:
 	GOARCH=arm GOOS=windows GOARM=7 $(GOBUILD) -o $(BINDIR)/$(NAME)-$@.exe $(APPDIR)
+
+windows-arm64:
+	GOARCH=arm64 GOOS=windows $(GOBUILD) -o $(BINDIR)/$(NAME)-$@.exe $(APPDIR)
 
 gz_releases=$(addsuffix .gz, $(PLATFORM_LIST))
 zip_releases=$(addsuffix .zip, $(WINDOWS_ARCH_LIST))
@@ -99,5 +129,6 @@ $(zip_releases): %.zip : %
 all-arch: $(PLATFORM_LIST) $(WINDOWS_ARCH_LIST)
 
 releases: $(gz_releases) $(zip_releases)
+
 clean:
 	rm $(BINDIR)/*

@@ -53,6 +53,13 @@ docker build --pull --tag http2mail:latest -f Dockerfile https://github.com/fimr
 docker run -d --name http2mail -P http2mail:latest [your_api_key]
 ```
 
+（可选）交叉编译 Docker 镜像：
+```bash
+docker buildx create --use
+docker buildx build --platform linux/amd64,linux/arm64 -t http2mail:latest -f Dockerfile https://github.com/fimreal/go-http2mail.git
+docker buildx rm
+```
+
 ### 设置调试模式
 
 可以通过设置环境变量 `DEBUG` 来启用调试模式：
